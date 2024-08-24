@@ -1,0 +1,45 @@
+import os
+from telethon.sync import TelegramClient
+from telethon.tl.functions.messages import GetDialogsRequest
+from telethon.tl.types import InputPeerEmpty, DocumentAttributeFilename
+from tqdm import tqdm
+
+api_id =        # Your API ID in int form
+api_hash = ""  # Your API HASH in string form
+
+username = '@EngkHalid7' #your telegram username in string form
+
+async def download_media(group, cl, name, target_directory):
+    messages = await cl.get_messages(group, limit=1)
+    for message in tqdm(messages):
+        if message.document and message.document.mime_type == 'application/pdf':
+            # Check if the document has a filename attribute
+            for attr in message.document.attributes:
+                if isinstance(attr, DocumentAttributeFilename):
+                    filename = attr.file_name
+                    break
+            else:
+                filename = 'file.pdf'
+            
+            file_path = os.path.join(target_directory, filename)
+            if not os.path.exists(file_path):
+                await message.download_media(file=file_path)
+
+async with TelegramClient(username, api_id, api_hash) as client:
+    result = await client(GetDialogsRequest(
+        offset_date=None,
+        offset_id=0,
+        offset_peer=InputPeerEmpty(),
+        limit=30,
+        hash=0,
+    ))
+
+    title = 'مكتبة القانون'  # Title for channel 
+    target_directory = '/teamspace/studios/this_studio/مكتبة القانون'  # Change this to your desired directory
+    
+    if not os.path.exists(target_directory):
+        os.makedirs(target_directory)
+
+    for chat in result.chats:
+        if chat.title == title:
+            await download_media(chat, client, title, target_directory)
