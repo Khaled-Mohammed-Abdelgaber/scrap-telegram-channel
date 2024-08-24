@@ -7,12 +7,12 @@ from tqdm import tqdm
 api_id =        # Your API ID in int form
 api_hash = ""  # Your API HASH in string form
 
-username = '@EngkHalid7' #your telegram username in string form
+username = '@username' #your telegram username in string form
 
 async def download_media(group, cl, name, target_directory):
-    messages = await cl.get_messages(group, limit=1)
+    messages = await cl.get_messages(group, limit=1) # limit indicate the number of files you want to scrap
     for message in tqdm(messages):
-        if message.document and message.document.mime_type == 'application/pdf':
+        if message.document and message.document.mime_type == 'application/pdf': #pdf indicate the type of files you want to scrape
             # Check if the document has a filename attribute
             for attr in message.document.attributes:
                 if isinstance(attr, DocumentAttributeFilename):
